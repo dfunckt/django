@@ -14,7 +14,6 @@ from django.conf import settings
 from django.core import signals
 from django.core import signing
 from django.core.exceptions import DisallowedRedirect
-from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
@@ -473,7 +472,10 @@ class JsonResponse(HttpResponse):
       to ``True``.
     """
 
-    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True, **kwargs):
+    def __init__(self, data, encoder=None, safe=True, **kwargs):
+        if encoder is None:
+            from django.core.serializers.json import DjangoJSONEncoder
+            encoder = DjangoJSONEncoder
         if safe and not isinstance(data, dict):
             raise TypeError('In order to allow non-dict objects to be '
                 'serialized set the safe parameter to False')
